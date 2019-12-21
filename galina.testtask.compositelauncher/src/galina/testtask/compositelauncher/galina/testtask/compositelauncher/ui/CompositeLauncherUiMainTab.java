@@ -1,6 +1,9 @@
 package galina.testtask.compositelauncher.ui;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -15,16 +18,14 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.dialogs.FilteredTree;
-import org.eclipse.ui.dialogs.PatternFilter;
-
 import galina.testtask.compositelauncher.CompositeLauncherConfigurationHelper;
+import galina.testtask.compositelauncher.CompositeLauncherValidator;
 import galina.testtask.compositelauncher.LaunchConfigurationItem;
 
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.custom.StyledText;
 
 public class CompositeLauncherUiMainTab extends AbstractLaunchConfigurationTab {
 	public final static Logger logger = Logger.getLogger(CompositeLauncherUiMainTab.class.toString());
@@ -50,7 +51,6 @@ public class CompositeLauncherUiMainTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void createControl(Composite parent) {
 		ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
-		scrolledComposite.setMinWidth(710);
 		scrolledComposite.setMinHeight(300);
 		Composite composite = new Composite(scrolledComposite, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -113,8 +113,10 @@ public class CompositeLauncherUiMainTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfiguration) {
-		boolean superValid = super.isValid(launchConfiguration);
-		return superValid;
+		return super.isValid(launchConfiguration)
+				&& CompositeLauncherValidator.validateConfiguration(launchConfiguration, mode)
+				&& !chosenConfigurations.isEmpty();
+
 	}
 
 	private void init(ScrolledComposite composite) {
@@ -139,40 +141,40 @@ public class CompositeLauncherUiMainTab extends AbstractLaunchConfigurationTab {
 		groupAvailable.setText(CompositeLauncherUiStandartElements.AVAILABLE_GROUP_TEXT);
 
 		Group groupChosen = new Group(mainGroup, SWT.NONE);
-		groupChosen.setLayout(new GridLayout(5, false));
+		groupChosen.setLayout(new FormLayout());
 		FormData fd_groupChosen = new FormData();
-		fd_groupChosen.top = new FormAttachment(groupAvailable, 0, SWT.TOP);
-		fd_groupChosen.bottom = new FormAttachment(100, -36);
-		fd_groupChosen.right = new FormAttachment(100, -13);
+		fd_groupChosen.bottom = new FormAttachment(100, -31);
+		fd_groupChosen.top = new FormAttachment(0, 25);
+		fd_groupChosen.right = new FormAttachment(100, -79);
 		groupChosen.setLayoutData(fd_groupChosen);
 		groupChosen.setText(CompositeLauncherUiStandartElements.CHOSEN_GROUP_TEXT);
 
 		Button toChosen = new Button(mainGroup, SWT.NONE);
 		fd_groupChosen.left = new FormAttachment(50);
 		FormData fd_toChosen = new FormData();
+		fd_toChosen.bottom = new FormAttachment(0, 58);
+		fd_toChosen.left = new FormAttachment(groupAvailable, 31);
+		fd_toChosen.right = new FormAttachment(groupChosen, -24);
 		fd_toChosen.top = new FormAttachment(0, 36);
-		fd_toChosen.left = new FormAttachment(groupAvailable, 6);
-		fd_toChosen.right = new FormAttachment(groupChosen, -6);
 		toChosen.setLayoutData(fd_toChosen);
 		toChosen.setText(CompositeLauncherUiStandartElements.TO_CHOSEN_BUTTON_TEXT);
 
 		Button toAvailable = new Button(mainGroup, SWT.NONE);
-		fd_toChosen.bottom = new FormAttachment(toAvailable, -6);
 		fd_groupAvailable.right = new FormAttachment(32);
 		FormData fd_toAvailable = new FormData();
-		fd_toAvailable.bottom = new FormAttachment(0, 86);
-		fd_toAvailable.right = new FormAttachment(groupChosen, -6);
-		fd_toAvailable.left = new FormAttachment(groupAvailable, 6);
-		fd_toAvailable.top = new FormAttachment(0, 64);
+		fd_toAvailable.bottom = new FormAttachment(toChosen, 28, SWT.BOTTOM);
+		fd_toAvailable.top = new FormAttachment(toChosen, 6);
+		fd_toAvailable.left = new FormAttachment(groupAvailable, 31);
+		fd_toAvailable.right = new FormAttachment(groupChosen, -24);
 		toAvailable.setLayoutData(fd_toAvailable);
 		toAvailable.setText(CompositeLauncherUiStandartElements.TO_AVAILABLE_BUTTON_TEXT);
 
 		Button allToChosen = new Button(mainGroup, SWT.NONE);
 		FormData fd_allToChosen = new FormData();
-		fd_allToChosen.bottom = new FormAttachment(toAvailable, 32, SWT.BOTTOM);
-		fd_allToChosen.right = new FormAttachment(groupChosen, -6);
-		fd_allToChosen.top = new FormAttachment(toAvailable, 10);
-		fd_allToChosen.left = new FormAttachment(groupAvailable, 6);
+		fd_allToChosen.bottom = new FormAttachment(0, 118);
+		fd_allToChosen.left = new FormAttachment(groupAvailable, 31);
+		fd_allToChosen.right = new FormAttachment(groupChosen, -24);
+		fd_allToChosen.top = new FormAttachment(0, 96);
 		allToChosen.setLayoutData(fd_allToChosen);
 		allToChosen.setText(CompositeLauncherUiStandartElements.ALL_TO_CHOSEN_BUTTON_TEXT);
 
@@ -181,54 +183,62 @@ public class CompositeLauncherUiMainTab extends AbstractLaunchConfigurationTab {
 		FormData fd_allToAvailable = new FormData();
 		fd_allToAvailable.bottom = new FormAttachment(allToChosen, 28, SWT.BOTTOM);
 		fd_allToAvailable.top = new FormAttachment(allToChosen, 6);
-		fd_allToAvailable.right = new FormAttachment(groupChosen, -6);
-		fd_allToAvailable.left = new FormAttachment(groupAvailable, 6);
+		fd_allToAvailable.left = new FormAttachment(groupAvailable, 31);
+		fd_allToAvailable.right = new FormAttachment(groupChosen, -24);
 		allToAvailable.setLayoutData(fd_allToAvailable);
-		FormData fd_allToAvailable1 = new FormData();
-		fd_allToAvailable1.right = new FormAttachment(groupChosen, -6);
 
 		FormData fd_chosenList = new FormData();
 		fd_chosenList.left = new FormAttachment(0);
 		fd_chosenList.bottom = new FormAttachment(100, -7);
 		fd_chosenList.top = new FormAttachment(0, 1);
-
-		Button btnUp = new Button(groupChosen, SWT.NONE);
 		fd_chosenList.right = new FormAttachment(100, -201);
+
+		Composite compositeChosen = new Composite(groupChosen, SWT.NONE);
+		FormData fd_compositeChosen = new FormData();
+		fd_compositeChosen.left = new FormAttachment(0);
+		fd_compositeChosen.bottom = new FormAttachment(100, -1);
+		fd_compositeChosen.top = new FormAttachment(0);
+		compositeChosen.setLayoutData(fd_compositeChosen);
+		compositeChosen.setLayout(new GridLayout(1, true));
+
+		FilteredTree chosenConfigurationsFilteredTree = new FilteredTree(compositeChosen,
+				SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI, new LaunchConfigurationPatternFilter(), true,
+				true);
+
+		chosenConigurationsViewer = chosenConfigurationsFilteredTree.getViewer();
+		chosenConigurationsViewer.setContentProvider(new ChosenConfigurationContentProvider());
+		chosenConigurationsViewer.setLabelProvider(new LaunchConfigurationLabelProvider());
+		chosenLaunchConfViewerTree = chosenConigurationsViewer.getTree();
+
+		GridData gd_chosenLaunchConfViewerTree = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		gd_chosenLaunchConfViewerTree.heightHint = 330;
+		chosenLaunchConfViewerTree.setLayoutData(gd_chosenLaunchConfViewerTree);
+		chosenLaunchConfViewerTree.setHeaderVisible(false);
+		chosenLaunchConfViewerTree.setFont(groupChosen.getFont());
+
+		TreeColumn chosenNameColumn = new TreeColumn(chosenLaunchConfViewerTree, SWT.CENTER);
+		chosenNameColumn.setWidth(384);
+		chosenNameColumn.setResizable(false);
+		Button btnUp = new Button(groupChosen, SWT.NONE);
+		fd_compositeChosen.right = new FormAttachment(btnUp, -6);
 		FormData fd_btnUp = new FormData();
-		fd_btnUp.top = new FormAttachment(0, 30);
-	//	btnUp.setLayoutData(fd_btnUp);
+		fd_btnUp.left = new FormAttachment(100, -119);
+		fd_btnUp.right = new FormAttachment(100, -72);
+		fd_btnUp.top = new FormAttachment(0, 31);
+		btnUp.setLayoutData(fd_btnUp);
+
 		btnUp.setText(CompositeLauncherUiStandartElements.UP_BUTTON_TEXT);
-		new Label(groupChosen, SWT.NONE);
-		new Label(groupChosen, SWT.NONE);
 
-		Button btnDown = new Button(groupChosen, SWT.NONE);
-		FormData fd_btnDown = new FormData();
-		fd_btnDown.top = new FormAttachment(btnUp, 6);
-		//btnDown.setLayoutData(fd_btnDown);
-		btnDown.setText(CompositeLauncherUiStandartElements.DOWN_BUTTON_TEXT);
-
-		btnParallel = new Button(groupChosen, SWT.RADIO);
 		FormData fd_btnParallel = new FormData();
-		//btnParallel.setLayoutData(fd_btnParallel);
-		btnParallel.setText(CompositeLauncherUiStandartElements.PARALLEL_RADIO_BUTTON_TEXT);
 		FormData fd_btnSequential = new FormData();
-		fd_btnSequential.left = new FormAttachment(btnDown, 52);
-		fd_btnSequential.top = new FormAttachment(btnDown, 5, SWT.TOP);
-
-		fd_allToAvailable1.bottom = new FormAttachment(allToChosen, 28, SWT.BOTTOM);
-		fd_allToAvailable1.top = new FormAttachment(allToChosen, 6);
-		fd_allToAvailable1.left = new FormAttachment(groupAvailable, 6);
 		FormData fd_launchConfViewerTree = new FormData();
 		fd_launchConfViewerTree.bottom = new FormAttachment(100, -7);
 		fd_launchConfViewerTree.top = new FormAttachment(0, 32);
 		fd_launchConfViewerTree.right = new FormAttachment(100, -7);
 		fd_launchConfViewerTree.left = new FormAttachment(0, 6);
-		// tree.setLayoutData(fd_launchConfViewerTree);
 
 		FilteredTree availableConfigurationsFilteredTree = new FilteredTree(groupAvailable,
-				SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI,
-				new LaunchConfigurationPatternFilter(), 
-				true,
+				SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI, new LaunchConfigurationPatternFilter(), true,
 				true);
 
 		availableConigurationsViewer = availableConfigurationsFilteredTree.getViewer();
@@ -238,51 +248,45 @@ public class CompositeLauncherUiMainTab extends AbstractLaunchConfigurationTab {
 		availableLaunchConfViewerTree = availableConigurationsViewer.getTree();
 		availableLaunchConfViewerTree.setHeaderVisible(false);
 		availableLaunchConfViewerTree.setFont(groupAvailable.getFont());
-				new Label(groupChosen, SWT.NONE);
-				
-				chosenConigurationsViewer = new TreeViewer(groupChosen, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI);//chosenConfigurationsFilteredTree.getViewer();
-				chosenConigurationsViewer.setContentProvider(new ChosenConfigurationContentProvider());
-				chosenConigurationsViewer.setLabelProvider(new LaunchConfigurationLabelProvider());
-				chosenLaunchConfViewerTree = chosenConigurationsViewer.getTree();
-				GridData gd_chosenLaunchConfViewerTree = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-				gd_chosenLaunchConfViewerTree.heightHint = 304;
-				chosenLaunchConfViewerTree.setLayoutData(gd_chosenLaunchConfViewerTree);
-				fd_btnUp.left = new FormAttachment(chosenLaunchConfViewerTree, 10);
-				fd_btnDown.left = new FormAttachment(chosenLaunchConfViewerTree, 6);
-				
-					//	chosenLaunchConfViewerTree.setLayoutData(fd_chosenLaunchConfViewerTree);
-						chosenLaunchConfViewerTree.setHeaderVisible(false);
-						chosenLaunchConfViewerTree.setFont(groupChosen.getFont());
-						
-								TreeColumn chosenNameColumn = new TreeColumn(chosenLaunchConfViewerTree, SWT.CENTER);
-								chosenNameColumn.setText(" ");
-								chosenNameColumn.setWidth(384);
-								chosenNameColumn.setResizable(false);
-								chosenNameColumn.setText(" ");
-		
-				btnSequential = new Button(groupChosen, SWT.RADIO);
-				fd_btnParallel.bottom = new FormAttachment(btnSequential, -6);
-				fd_btnParallel.left = new FormAttachment(btnSequential, 0, SWT.LEFT);
-				//	btnSequential.setLayoutData(fd_btnSequential);
-					btnSequential.setText(CompositeLauncherUiStandartElements.SEQUENTIAL_RADIO_BUTTON_TEXT);
 
-		FilteredTree chosenConfigurationsFilteredTree = new FilteredTree(groupChosen,
-				SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI,
-				new LaunchConfigurationPatternFilter(), 
-				true,
-				true);
+		Button btnDown = new Button(groupChosen, SWT.NONE);
+		FormData fd_btnDown1 = new FormData();
+		fd_btnDown1.left = new FormAttachment(100, -119);
+		fd_btnDown1.right = new FormAttachment(100, -57);
+		fd_btnDown1.top = new FormAttachment(btnUp, 6);
+		btnDown.setLayoutData(fd_btnDown1);
+		btnDown.setText(CompositeLauncherUiStandartElements.DOWN_BUTTON_TEXT);
+		fd_btnSequential.left = new FormAttachment(btnDown, 52);
+		fd_btnSequential.top = new FormAttachment(btnDown, 5, SWT.TOP);
+
+		btnSequential = new Button(groupChosen, SWT.RADIO);
+		FormData fd_btnSequential1 = new FormData();
+		fd_btnSequential1.left = new FormAttachment(100, -119);
+		fd_btnSequential1.right = new FormAttachment(100, -41);
+		btnSequential.setLayoutData(fd_btnSequential1);
+		fd_btnParallel.bottom = new FormAttachment(btnSequential, -6);
+		fd_btnParallel.left = new FormAttachment(btnSequential, 0, SWT.LEFT);
+		btnSequential.setText(CompositeLauncherUiStandartElements.SEQUENTIAL_RADIO_BUTTON_TEXT);
+
+		btnParallel = new Button(groupChosen, SWT.RADIO);
+		fd_btnSequential1.top = new FormAttachment(btnParallel, 6);
+		FormData fd_btnParallel1 = new FormData();
+		fd_btnParallel1.left = new FormAttachment(100, -119);
+		fd_btnParallel1.right = new FormAttachment(100, -58);
+		fd_btnParallel1.top = new FormAttachment(0, 97);
+		btnParallel.setLayoutData(fd_btnParallel1);
+		btnParallel.setText(CompositeLauncherUiStandartElements.PARALLEL_RADIO_BUTTON_TEXT);
+
 		FormData fd_chosenLaunchConfViewerTree = new FormData();
 		fd_chosenLaunchConfViewerTree.bottom = new FormAttachment(100, -7);
 		fd_chosenLaunchConfViewerTree.top = new FormAttachment(0, 30);
 		fd_chosenLaunchConfViewerTree.left = new FormAttachment(0, 10);
 		fd_chosenLaunchConfViewerTree.right = new FormAttachment(0, 346);
 
-		
 		TreeColumn nameColumn = new TreeColumn(availableLaunchConfViewerTree, SWT.CENTER);
 		nameColumn.setWidth(384);
 		nameColumn.setResizable(false);
 		initButtons(toChosen, toAvailable, allToChosen, allToAvailable, btnUp, btnDown);
-		new Label(groupChosen, SWT.NONE);
 	}
 
 	private void initExecutionType() {
@@ -303,6 +307,7 @@ public class CompositeLauncherUiMainTab extends AbstractLaunchConfigurationTab {
 				System.out.print(availableLaunchConfViewerTree.getSelectionCount());
 				if (availableLaunchConfViewerTree.getSelectionCount() > 0) {
 					TreeItem[] chosenConfigurationsItems = availableLaunchConfViewerTree.getSelection();
+					System.out.println(chosenConfigurationsItems);
 					for (TreeItem item : chosenConfigurationsItems) {
 						CompositeLauncherConfigurationHelper.getConfigurationByName(item.getText(), mode)
 								.ifPresent(config -> chosenConfigurations.add(config));
@@ -363,6 +368,54 @@ public class CompositeLauncherUiMainTab extends AbstractLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		};
+
+		down.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				Set<Integer> selectedIndexes = Arrays.stream(chosenLaunchConfViewerTree.getSelection())
+						.map(item -> chosenLaunchConfViewerTree.indexOf(item))
+						.collect(Collectors.toSet());
+				for (int currentIndex = chosenConfigurations.size() - 1; currentIndex > 0; --currentIndex) {
+					if (!selectedIndexes.contains(currentIndex)) {
+						if (selectedIndexes.contains(currentIndex - 1)) {
+							int notSelectedIndex = currentIndex - 1;
+							while (selectedIndexes.contains(notSelectedIndex)) {
+								--notSelectedIndex;
+							}
+							notSelectedIndex++;
+							chosenConfigurations.add(notSelectedIndex, chosenConfigurations.remove(currentIndex));
+							currentIndex = notSelectedIndex + 1;
+						}
+					}
+				}
+				setChosenConfigurationsInput();
+				updateLaunchConfigurationDialog();
+			}
+		});
+		
+		up.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				Set<Integer> selectedIndexes = Arrays.stream(chosenLaunchConfViewerTree.getSelection())
+						.map(item -> chosenLaunchConfViewerTree.indexOf(item))
+						.collect(Collectors.toSet());
+				for (int currentIndex = 0; currentIndex < chosenConfigurations.size() - 1; ++currentIndex) {
+					if (!selectedIndexes.contains(currentIndex)) {
+						if (selectedIndexes.contains(currentIndex + 1)) {
+							int notSelectedIndex = currentIndex + 1;
+							while (selectedIndexes.contains(notSelectedIndex)) {
+								++notSelectedIndex;
+							}
+							notSelectedIndex--;
+							chosenConfigurations.add(notSelectedIndex, chosenConfigurations.remove(currentIndex));
+							currentIndex = notSelectedIndex - 1;
+						}
+					}
+				}
+				setChosenConfigurationsInput();
+				updateLaunchConfigurationDialog();
+			}
+		});
 
 		btnParallel.addSelectionListener(adapter);
 		btnSequential.addSelectionListener(adapter);
