@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="org.eclipse.debug.core.ILaunchDelegate"/>
+    <fullyQualifiedTypeName name="org.eclipse.debug.core.model.ILaunchConfigurationDelegate"/>
+    <fullyQualifiedTypeName name="org.eclipse.core.runtime.CoreException"/>
+    <fullyQualifiedTypeName name="org.eclipse.debug.core.ILaunchManager"/>
+    <fullyQualifiedTypeName name="org.eclipse.debug.core.ILaunchConfigurationType"/>
+    <fullyQualifiedTypeName name="org.eclipse.core.runtime.SubMonitor"/>
+    <fullyQualifiedTypeName name="org.eclipse.debug.core.model.IDebugTarget"/>
+    <fullyQualifiedTypeName name="org.eclipse.debug.ui.AbstractLaunchConfigurationTab"/>
+    <fullyQualifiedTypeName name="org.eclipse.swt.layout.GridLayout"/>
+    <fullyQualifiedTypeName name="org.eclipse.debug.core.ILaunchConfiguration"/>
+    <fullyQualifiedTypeName name="java.util.List"/>
+    <fullyQualifiedTypeName name="org.eclipse.swt.widgets.Label"/>
+    <fullyQualifiedTypeName name="org.eclipse.swt.widgets.Composite"/>
+    <fullyQualifiedTypeName name="org.eclipse.swt.SWT"/>
+    <fullyQualifiedTypeName name="java.util.stream.Collectors"/>
+    <fullyQualifiedTypeName name="org.eclipse.debug.core.DebugPlugin"/>
+    <fullyQualifiedTypeName name="java.util.Arrays"/>
+    <fullyQualifiedTypeName name="java.util.logging.Level"/>
+    <fullyQualifiedTypeName name="java.util.ArrayList"/>
+    <fullyQualifiedTypeName name="java.util.logging.Logger"/>
+    <fullyQualifiedTypeName name="org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup"/>
+    <fullyQualifiedTypeName name="org.eclipse.debug.ui.ILaunchConfigurationTab"/>
+    <fullyQualifiedTypeName name="org.eclipse.debug.ui.CommonTab"/>
+    <fullyQualifiedTypeName name="galina.testtask.compositelauncher.ui.CompositeLauncherUiHelper"/>
+    <fullyQualifiedTypeName name="org.eclipse.swt.events.SelectionListener"/>
+    <fullyQualifiedTypeName name="galina.testtask.compositelauncher.CompositeLauncherConfigurationHelper"/>
+</qualifiedTypeNameHistroy>

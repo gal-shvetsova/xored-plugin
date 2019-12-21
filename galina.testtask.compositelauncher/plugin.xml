@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension point="org.eclipse.debug.core.launchConfigurationTypes">
+   		<launchConfigurationType
+      		id="galina.testtask.compositelauncher"
+      		delegate="galina.testtask.compositelauncher.CompositeLauncherDelegate"
+      		delegateName="Composite Launcher"
+      		modes="run, debug"
+      		name="Composite">
+   		</launchConfigurationType>
+   </extension>
+   
+	<extension point="org.eclipse.debug.core.launchDelegates">
+   		<launchDelegate
+  			id="galina.testtask.compositelauncher.CompositeLauncherDelegate"
+   			delegate="galina.testtask.compositelauncher.CompositeLauncherDelegate"
+   			type="galina.testtask.compositelauncher"
+   			modes="profile">
+  		</launchDelegate>
+ 	</extension>
+ 	<extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+    	<launchConfigurationTabGroup
+        	type="galina.testtask.compositelauncher"
+            class="galina.testtask.compositelauncher.ui.CompositeLauncherUiTabGroup"
+            id="galina.testtask.compositelauncher.launchConfigurationTabGroup">
+        </launchConfigurationTabGroup>
+    </extension>
+</plugin>
